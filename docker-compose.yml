@@ -1,0 +1,93 @@
+# Moltbook Agent - Security-Hardened Docker Compose
+#
+# Usage:
+#   docker compose up -d          # Start agent
+#   docker compose logs -f        # View logs
+#   docker compose down           # Stop agent
+#
+# Security features:
+#   - Non-root user
+#   - All capabilities dropped
+#   - No privilege escalation
+#   - Read-only root filesystem
+#   - Limited resources
+#   - No host network access
+
+services:
+  agent:
+    build: .
+    container_name: moltbook-agent
+    restart: unless-stopped
+
+    # Security hardening
+    user: "1000:1000"
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+
+    # Resource limits (prevent runaway costs/attacks)
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+    # Environment variables (API keys)
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - MOLTBOOK_API_KEY=${MOLTBOOK_API_KEY:-}
+      - PYTHONUNBUFFERED=1
+
+    # Mount config files and writable directories
+    volumes:
+      # Config files (read-only)
+      - ./agent_config.yaml:/app/agent_config.yaml:ro
+      - ./SOUL.md:/app/SOUL.md:ro
+      - ./AGENTS.md:/app/AGENTS.md:ro
+
+      # Writable directories for state
+      - ./.moltbook:/app/.moltbook
+      - ./logs:/app/logs
+
+      # Temp directory (required for read-only root)
+      - /tmp
+
+    # Healthcheck
+    healthcheck:
+      test: ["CMD", "python", "-c", "print('healthy')"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Optional: Observatory dashboard
+  observatory:
+    build: .
+    container_name: moltbook-observatory
+    command: ["python", "./moltbook", "observatory", "--no-browser", "--host", "0.0.0.0"]
+    ports:
+      - "8080:8080"
+    user: "1000:1000"
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    volumes:
+      - ./.moltbook:/app/.moltbook:ro
+      - /tmp
+    profiles:
+      - monitoring

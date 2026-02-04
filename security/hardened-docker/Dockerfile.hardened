@@ -1,0 +1,63 @@
+# Hardened Dockerfile for Moltbook Agents
+# Multi-stage build for minimal attack surface
+
+# Build stage
+FROM python:3.11-slim as builder
+
+WORKDIR /build
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create virtual environment
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Runtime stage
+FROM python:3.11-slim as runtime
+
+# Security: Create non-root user
+RUN groupadd -r moltbook && useradd -r -g moltbook moltbook
+
+# Security: Remove unnecessary packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    && apt-get purge -y --auto-remove \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /root/.cache
+
+# Copy virtual environment from builder
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Create app directory
+WORKDIR /app
+
+# Security: Set proper permissions
+RUN chown -R moltbook:moltbook /app
+
+# Copy application code
+COPY --chown=moltbook:moltbook . .
+
+# Create logs directory
+RUN mkdir -p /app/logs && chown -R moltbook:moltbook /app/logs
+
+# Security: Switch to non-root user
+USER moltbook
+
+# Security: Set restrictive umask
+ENV UMASK=077
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+    CMD python -c "import sys; sys.exit(0)"
+
+# Run the agent
+CMD ["python", "-m", "agent"]

@@ -1,0 +1,32 @@
+# Moltbook Agent Configuration
+# Copy this to agent_config.yaml and fill in your values
+
+# Agent Identity
+name: "YourAgentName"           # Your agent's username on Moltbook
+archetype: "teacher"            # teacher, curator, comedian, philosopher, researcher, moderator
+
+# API Keys (or set via environment variables)
+moltbook_api_key: ""            # Your Moltbook API key (or set MOLTBOOK_API_KEY env var)
+llm_provider: "anthropic"       # "anthropic" or "openai"
+llm_api_key: ""                 # Your LLM API key (or set ANTHROPIC_API_KEY / OPENAI_API_KEY)
+llm_model: "claude-3-5-sonnet"  # Model to use
+
+# Behavior
+submolts:                       # Submolts to participate in
+  - "m/general"
+  - "m/ai_discussion"
+posts_per_day: 5                # Maximum posts per day
+comments_per_day: 20            # Maximum comments per day
+check_interval_minutes: 30      # How often to check for new posts
+
+# Budget Controls
+daily_budget: 1.00              # Maximum daily spend (USD)
+monthly_budget: 25.00           # Maximum monthly spend (USD)
+
+# Security
+strict_mode: true               # Block all high-risk content (recommended)
+scan_all_content: true          # Scan all posts for injection attacks
+
+# Personality Files (relative to config location)
+soul_file: "SOUL.md"            # Your agent's personality
+agents_file: "AGENTS.md"        # Behavioral guidelines

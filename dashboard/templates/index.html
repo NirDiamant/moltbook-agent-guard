@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moltbook Security Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="logo">🛡️</span>
+            <h1>Moltbook Security Dashboard</h1>
+        </div>
+        <div class="nav-status">
+            <span class="status-indicator active"></span>
+            <span>Protection Active</span>
+            <span class="status-indicator {{ 'active' if slack_configured else 'inactive' }}"></span>
+            <span>Alerts</span>
+        </div>
+    </nav>
+
+    <main class="dashboard">
+        <!-- Security Stats Cards -->
+        <section class="stats-grid">
+            <div class="stat-card stat-card-danger">
+                <div class="stat-icon">🚨</div>
+                <div class="stat-content">
+                    <span class="stat-value" id="threats-blocked">{{ security_stats.high_risk_blocked }}</span>
+                    <span class="stat-label">High-Risk Blocked</span>
+                </div>
+            </div>
+            <div class="stat-card stat-card-warning">
+                <div class="stat-icon">⚠️</div>
+                <div class="stat-content">
+                    <span class="stat-value" id="threats-today">{{ security_stats.today_incidents }}</span>
+                    <span class="stat-label">Threats Today</span>
+                </div>
+            </div>
+            <div class="stat-card stat-card-success">
+                <div class="stat-icon">🛡️</div>
+                <div class="stat-content">
+                    <span class="stat-value" id="total-protected">{{ security_stats.total_incidents }}</span>
+                    <span class="stat-label">Total Protected</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-content">
+                    <span class="stat-value" id="scan-rate">100%</span>
+                    <span class="stat-label">Scan Coverage</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Content Grid -->
+        <section class="content-grid">
+            <!-- Security Incidents Feed -->
+            <div class="panel security-feed">
+                <div class="panel-header panel-header-security">
+                    <h2>🔐 Security Incidents</h2>
+                    <div class="header-actions">
+                        <button class="btn btn-sm btn-danger" onclick="scanMoltbook()">Scan Now</button>
+                        <button class="btn btn-sm" onclick="refreshIncidents()">Refresh</button>
+                    </div>
+                </div>
+                <div class="incident-list" id="incident-list">
+                    {% if incidents %}
+                    {% for incident in incidents %}
+                    <div class="incident-item incident-{{ incident.risk_level }}" data-id="{{ incident.id }}">
+                        <div class="incident-severity">
+                            {% if incident.risk_level == 'high' %}
+                            <span class="severity-badge severity-high">HIGH</span>
+                            {% elif incident.risk_level == 'medium' %}
+                            <span class="severity-badge severity-medium">MED</span>
+                            {% else %}
+                            <span class="severity-badge severity-low">LOW</span>
+                            {% endif %}
+                        </div>
+                        <div class="incident-content">
+                            <div class="incident-meta">
+                                <span class="incident-author">@{{ incident.source_author }}</span>
+                                <span class="incident-submolt">m/{{ incident.source_submolt }}</span>
+                                <span class="incident-time">{{ incident.timestamp }}</span>
+                            </div>
+                            <div class="incident-attacks">
+                                {% for attack in incident.attack_types %}
+                                <span class="attack-tag">{{ attack }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="incident-preview">{{ incident.content_preview }}</div>
+                            <div class="incident-action">
+                                <span class="action-badge action-{{ incident.action_taken }}">
+                                    {% if incident.action_taken == 'blocked' %}🚫 BLOCKED{% else %}⚠️ FLAGGED{% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="no-incidents">
+                        <p>✅ No security incidents detected yet</p>
+                        <p class="hint">Click "Scan Now" to analyze live Moltbook content</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Attack Types Breakdown -->
+            <div class="panel attack-breakdown">
+                <div class="panel-header">
+                    <h2>🎯 Attack Types Detected</h2>
+                </div>
+                <div class="attack-stats" id="attack-stats">
+                    {% if security_stats.attack_breakdown %}
+                    {% for attack_type, count in security_stats.attack_breakdown.items() %}
+                    <div class="attack-stat-item">
+                        <div class="attack-info">
+                            <span class="attack-name">{{ attack_type }}</span>
+                            <span class="attack-count">{{ count }}</span>
+                        </div>
+                        <div class="attack-bar">
+                            <div class="attack-bar-fill" style="width: {{ (count / security_stats.total_incidents * 100) if security_stats.total_incidents > 0 else 0 }}%"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="no-attacks">
+                        <p>No attacks detected yet</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Risk Level Summary -->
+                <div class="risk-summary">
+                    <h3>Today's Risk Levels</h3>
+                    <div class="risk-bars">
+                        <div class="risk-item">
+                            <span class="risk-label">High</span>
+                            <span class="risk-count risk-high">{{ security_stats.recent_risk_levels.high }}</span>
+                        </div>
+                        <div class="risk-item">
+                            <span class="risk-label">Medium</span>
+                            <span class="risk-count risk-medium">{{ security_stats.recent_risk_levels.medium }}</span>
+                        </div>
+                        <div class="risk-item">
+                            <span class="risk-label">Low</span>
+                            <span class="risk-count risk-low">{{ security_stats.recent_risk_levels.low }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Charts Section -->
+        <section class="charts-section">
+            <div class="panel chart-panel">
+                <div class="panel-header">
+                    <h2>📈 Threats Over Time</h2>
+                </div>
+                <canvas id="threatsChart"></canvas>
+            </div>
+            <div class="panel chart-panel">
+                <div class="panel-header">
+                    <h2>🎯 Attack Distribution</h2>
+                </div>
+                <canvas id="attackChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Activity Feed (Secondary) -->
+        <section class="activity-section">
+            <div class="panel activity-feed">
+                <div class="panel-header">
+                    <h2>📊 Agent Activity</h2>
+                    <button class="btn btn-sm" onclick="refreshActivities()">Refresh</button>
+                </div>
+                <div class="activity-list" id="activity-list">
+                    {% for activity in activities %}
+                    <div class="activity-item" data-id="{{ activity.id }}">
+                        <div class="activity-type">
+                            {% if activity.type == 'post' %}📝{% elif activity.type == 'comment' %}💬{% else %}🎯{% endif %}
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-meta">
+                                <span class="community">m/{{ activity.community }}</span>
+                                <span class="timestamp">{{ activity.timestamp }}</span>
+                            </div>
+                            {% if activity.title %}
+                            <div class="activity-title">{{ activity.title }}</div>
+                            {% endif %}
+                            <div class="activity-text">{{ activity.content[:100] }}{% if activity.content|length > 100 %}...{% endif %}</div>
+                            <div class="activity-stats">
+                                <span>⬆️ {{ activity.upvotes }}</span>
+                                <span>💬 {{ activity.comments_count }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Scan Modal -->
+    <div class="modal" id="scan-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🔍 Scanning Moltbook...</h3>
+                <button class="btn-close" onclick="closeScanModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="scan-results">
+                <div class="scanning-indicator">
+                    <div class="spinner"></div>
+                    <p>Analyzing content for threats...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script>
+        // Initialize charts
+        let threatsChart, attackChart;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initCharts();
+            loadSecurityData();
+            startPolling();
+        });
+
+        function initCharts() {
+            const threatsCtx = document.getElementById('threatsChart').getContext('2d');
+            threatsChart = new Chart(threatsCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Threats Blocked',
+                        data: [],
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            const attackCtx = document.getElementById('attackChart').getContext('2d');
+            attackChart = new Chart(attackCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: [
+                            '#ef4444', '#f97316', '#eab308', '#22c55e',
+                            '#06b6d4', '#6366f1', '#8b5cf6', '#ec4899'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        async function loadSecurityData() {
+            try {
+                const response = await fetch('/api/security/stats');
+                const data = await response.json();
+
+                // Update attack distribution chart
+                const labels = Object.keys(data.attack_breakdown || {});
+                const values = labels.map(k => data.attack_breakdown[k]);
+
+                attackChart.data.labels = labels;
+                attackChart.data.datasets[0].data = values;
+                attackChart.update();
+
+            } catch (error) {
+                console.error('Failed to load security data:', error);
+            }
+        }
+
+        async function scanMoltbook() {
+            const modal = document.getElementById('scan-modal');
+            const results = document.getElementById('scan-results');
+            modal.classList.add('active');
+            results.innerHTML = `
+                <div class="scanning-indicator">
+                    <div class="spinner"></div>
+                    <p>Analyzing Moltbook content for threats...</p>
+                </div>
+            `;
+
+            try {
+                const response = await fetch('/api/security/scan-moltbook', { method: 'POST' });
+                const data = await response.json();
+
+                let html = `
+                    <div class="scan-summary">
+                        <h4>Scan Complete</h4>
+                        <p>Scanned: <strong>${data.scanned}</strong> posts</p>
+                        <p>Threats Found: <strong class="${data.threats_found > 0 ? 'text-danger' : 'text-success'}">${data.threats_found}</strong></p>
+                    </div>
+                `;
+
+                if (data.incidents && data.incidents.length > 0) {
+                    html += '<div class="scan-incidents">';
+                    data.incidents.forEach(inc => {
+                        html += `
+                            <div class="scan-incident incident-${inc.risk_level}">
+                                <span class="severity-badge severity-${inc.risk_level}">${inc.risk_level.toUpperCase()}</span>
+                                <span>@${inc.source_author}</span>
+                                <span class="attack-tags">${inc.attack_types.join(', ')}</span>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                }
+
+                results.innerHTML = html;
+
+                // Refresh the page data
+                setTimeout(() => location.reload(), 2000);
+
+            } catch (error) {
+                results.innerHTML = `<p class="error">Scan failed: ${error.message}</p>`;
+            }
+        }
+
+        function closeScanModal() {
+            document.getElementById('scan-modal').classList.remove('active');
+        }
+
+        async function refreshIncidents() {
+            try {
+                const response = await fetch('/api/security/incidents?limit=20');
+                const data = await response.json();
+                showToast(`Loaded ${data.incidents.length} incidents`);
+                location.reload();
+            } catch (error) {
+                showToast('Failed to refresh incidents', 'error');
+            }
+        }
+
+        async function refreshActivities() {
+            try {
+                const response = await fetch('/api/tracker/refresh', { method: 'POST' });
+                const data = await response.json();
+                showToast(`Found ${data.new_activities} new activities`);
+                if (data.new_activities > 0) {
+                    setTimeout(() => location.reload(), 1000);
+                }
+            } catch (error) {
+                showToast('Failed to refresh activities', 'error');
+            }
+        }
+
+        async function refreshStats() {
+            try {
+                const response = await fetch('/api/security/stats');
+                const stats = await response.json();
+                document.getElementById('threats-blocked').textContent = stats.high_risk_blocked;
+                document.getElementById('threats-today').textContent = stats.today_incidents;
+                document.getElementById('total-protected').textContent = stats.total_incidents;
+            } catch (error) {
+                console.error('Failed to refresh stats:', error);
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function startPolling() {
+            setInterval(refreshStats, 30000);
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeScanModal();
+        });
+
+        document.getElementById('scan-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeScanModal();
+        });
+    </script>
+</body>
+</html>

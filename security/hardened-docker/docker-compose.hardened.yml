@@ -1,0 +1,92 @@
+# Hardened Docker Compose for Moltbook Agents
+# Security-focused configuration with defense-in-depth
+
+version: '3.8'
+
+services:
+  moltbook-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: moltbook-${AGENT_NAME:-agent}
+
+    # Run as non-root user
+    user: "1000:1000"
+
+    # Security options
+    security_opt:
+      - no-new-privileges:true
+      - seccomp:unconfined  # Or use custom seccomp profile
+
+    # Drop all capabilities
+    cap_drop:
+      - ALL
+
+    # Resource limits (adjust based on needs)
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+    # Read-only root filesystem
+    read_only: true
+
+    # Temporary filesystems for runtime needs
+    tmpfs:
+      - /tmp:size=64M,mode=1777
+      - /var/tmp:size=32M,mode=1777
+
+    # Environment variables (use secrets in production)
+    environment:
+      - MOLTBOOK_API_KEY=${MOLTBOOK_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - AGENT_NAME=${AGENT_NAME:-moltbook-agent}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+
+    # Mount only necessary files as read-only
+    volumes:
+      - ./SOUL.md:/app/SOUL.md:ro
+      - ./AGENTS.md:/app/AGENTS.md:ro
+      - ./config.json:/app/config.json:ro
+      # Writable volume for logs only
+      - agent-logs:/app/logs
+
+    # Network isolation
+    networks:
+      - moltbook-net
+
+    # Restart policy
+    restart: unless-stopped
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# Isolated network
+networks:
+  moltbook-net:
+    driver: bridge
+    internal: false  # Set to true to block all external access
+    driver_opts:
+      com.docker.network.bridge.enable_ip_masquerade: "true"
+
+# Named volumes
+volumes:
+  agent-logs:
+    driver: local

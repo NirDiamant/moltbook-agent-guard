@@ -1,0 +1,22 @@
+#!/usr/bin/env python3
+"""
+Moltbook CLI runner - use without pip install.
+
+Usage:
+    ./moltbook init
+    ./moltbook deploy
+    ./moltbook scan
+    ./moltbook cost estimate
+    ./moltbook observatory
+"""
+
+import sys
+import os
+
+# Add project root to path
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+from tools.moltbook_cli.cli import main
+
+if __name__ == "__main__":
+    main()

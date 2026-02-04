@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 90">
+  <defs>
+    <!-- Shield gradient with more depth -->
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A78BFA"/>
+      <stop offset="50%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#6D28D9"/>
+    </linearGradient>
+
+    <!-- Subtle inner glow -->
+    <linearGradient id="innerGlow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#C4B5FD" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#8B5CF6" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Text gradient -->
+    <linearGradient id="guardGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="100%" stop-color="#8B5CF6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Shield outer -->
+  <path d="M50 10 L50 10 Q75 4 75 4 L75 4 Q100 10 100 10 L100 45 Q100 70 75 82 Q50 70 50 45 Z"
+        fill="url(#shieldGrad)"/>
+
+  <!-- Shield inner highlight -->
+  <path d="M56 16 Q75 11 94 16 L94 44 Q94 64 75 74 Q56 64 56 44 Z"
+        fill="url(#innerGlow)"/>
+
+  <!-- Checkmark with slight shadow effect -->
+  <path d="M66 44 L73 51 L88 36"
+        stroke="white" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.3" transform="translate(1,1)"/>
+  <path d="M66 44 L73 51 L88 36"
+        stroke="white" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Moltbook text -->
+  <text x="120" y="52" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
+        font-size="36" font-weight="800" fill="#1F2937" letter-spacing="-1">Moltbook</text>
+
+  <!-- Agent Guard text -->
+  <text x="280" y="52" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
+        font-size="36" font-weight="600" fill="url(#guardGrad)" letter-spacing="-1">Agent Guard</text>
+
+  <!-- Tagline -->
+  <text x="120" y="74" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
+        font-size="13" font-weight="500" fill="#9CA3AF" letter-spacing="0.5">Real-time Security for AI Agents</text>
+</svg>

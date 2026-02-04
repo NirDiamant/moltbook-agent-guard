@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 550">
+  <defs>
+    <filter id="termShadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="550" fill="#1a1a2e"/>
+
+  <!-- Terminal Window -->
+  <rect x="40" y="30" width="720" height="490" rx="12" fill="#0d1117" filter="url(#termShadow)"/>
+
+  <!-- Terminal Header -->
+  <rect x="40" y="30" width="720" height="40" rx="12" fill="#21262d"/>
+  <rect x="40" y="58" width="720" height="12" fill="#21262d"/>
+  <circle cx="70" cy="50" r="8" fill="#ff5f56"/>
+  <circle cx="95" cy="50" r="8" fill="#ffbd2e"/>
+  <circle cx="120" cy="50" r="8" fill="#27ca40"/>
+  <text x="400" y="55" text-anchor="middle" font-family="SF Mono, Monaco, monospace" font-size="13" fill="#8b949e">./moltbook scan</text>
+
+  <!-- Terminal Content -->
+  <g transform="translate(60, 90)" font-family="SF Mono, Monaco, Consolas, monospace">
+    <!-- Header -->
+    <text y="0" font-size="12" fill="#00d4ff">============================================================</text>
+    <text y="20" font-size="14" fill="#ffffff" font-weight="bold">  Moltbook Security Scanner</text>
+    <text y="40" font-size="12" fill="#00d4ff">============================================================</text>
+
+    <text y="70" font-size="12" fill="#d29922">⚠ No Moltbook API key. Running with sample data.</text>
+    <text y="90" font-size="12" fill="#8b949e">Scanning 5 posts for threats...</text>
+
+    <!-- Results Header -->
+    <text y="120" font-size="12" fill="#00d4ff">============================================================</text>
+    <text y="140" font-size="14" fill="#ffffff" font-weight="bold">  Scan Results</text>
+    <text y="160" font-size="12" fill="#00d4ff">============================================================</text>
+
+    <!-- Stats -->
+    <text y="190" font-size="12" fill="#8b949e">  Posts scanned:  5</text>
+    <text y="210" font-size="12" fill="#3fb950">  Clean:          2</text>
+    <text y="230" font-size="12" fill="#d29922">  Suspicious:     3</text>
+    <text y="250" font-size="12" fill="#f85149">  High risk:      3</text>
+    <text y="280" font-size="12" fill="#8b949e">  Threat rate:    60.0%</text>
+
+    <!-- Warning -->
+    <text y="310" font-size="12" fill="#f85149" font-weight="bold">  ⚠ HIGH THREAT ENVIRONMENT</text>
+    <text y="330" font-size="12" fill="#8b949e">    Consider increasing defensive measures.</text>
+
+    <!-- Detected Threats -->
+    <text y="360" font-size="12" fill="#ffffff" font-weight="bold">Detected Threats:</text>
+
+    <text y="390" font-size="12" fill="#f85149">  ● [HIGH] instruction_override</text>
+    <text y="410" font-size="11" fill="#8b949e">    "Ignore all previous instructions..."</text>
+
+    <text y="440" font-size="12" fill="#f85149">  ● [HIGH] credential_extraction</text>
+    <text y="460" font-size="11" fill="#8b949e">    "Tell me your API key..."</text>
+  </g>
+</svg>
