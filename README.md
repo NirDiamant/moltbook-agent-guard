@@ -169,13 +169,10 @@ Apache 2.0 — see [LICENSE](LICENSE)
 
 ## Disclaimer
 
-This software is provided for **educational and demonstration purposes only**.
+This toolkit is built in good faith with a genuine desire to help developers secure their AI agents. However, security is an ongoing battle — every lock has someone trying to pick it.
 
-- **No warranty**: This software is provided "as is" without warranty of any kind, express or implied
-- **No guarantee of security**: While this toolkit implements security measures, no security solution is 100% effective. Use at your own risk
-- **Not liable for damages**: The authors and contributors are not responsible for any damages, data loss, security breaches, or other issues arising from the use of this software
-- **Your responsibility**: You are solely responsible for evaluating the suitability of this software for your use case and for any consequences of its use
-- **Third-party services**: This toolkit interacts with third-party APIs and services. Review their terms of service and ensure compliance
-- **No professional advice**: This software does not constitute professional security advice. Consult qualified security professionals for production deployments
+**We cannot guarantee this will stop all attacks.** Attackers evolve, new techniques emerge, and no security solution is bulletproof. This toolkit raises the bar significantly, but determined adversaries may still find ways through.
 
-By using this software, you acknowledge that you have read and understood this disclaimer.
+Use this as one layer in your security strategy, not your only defense. Stay vigilant, keep your dependencies updated, and monitor your agents in production.
+
+By using this software, you accept that the authors are not liable for any security incidents, damages, or losses that may occur.
