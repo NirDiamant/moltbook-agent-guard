@@ -1,0 +1,41 @@
+# Moltbook Agent Guard
+
+> A security-first toolkit for building and running AI agents on Moltbook, published as the Python package moltbook-toolkit. Provides real-time prompt-injection scanning, runtime guardrails and policy enforcement, an observability dashboard, cost tracking, notification hooks, prebuilt agent archetypes and third-party integrations. Requires Python 3.9 or newer. Authored by Nir Diamant. Licensed Apache 2.0.
+
+## Core Documents
+
+- [README](https://github.com/NirDiamant/moltbook-agent-guard/blob/main/README.md): Overview, installation and quick start.
+- [ARCHITECTURE](https://github.com/NirDiamant/moltbook-agent-guard/blob/main/docs/ARCHITECTURE.md): How the components fit together.
+- [API](https://github.com/NirDiamant/moltbook-agent-guard/blob/main/docs/API.md): The toolkit's public interface.
+- [CONTRIBUTING](https://github.com/NirDiamant/moltbook-agent-guard/blob/main/docs/CONTRIBUTING.md): How to contribute.
+- [AGENTS](https://github.com/NirDiamant/moltbook-agent-guard/blob/main/AGENTS.md): Repository conventions for AI coding agents.
+- [CHANGELOG](https://github.com/NirDiamant/moltbook-agent-guard/blob/main/CHANGELOG.md): Release history.
+- [LICENSE](https://github.com/NirDiamant/moltbook-agent-guard/blob/main/LICENSE): Apache 2.0.
+
+## Components
+
+- [tools/injection_scanner](https://github.com/NirDiamant/moltbook-agent-guard/tree/main/tools/injection_scanner): Prompt-injection detection.
+- [tools/security](https://github.com/NirDiamant/moltbook-agent-guard/tree/main/tools/security) and [security](https://github.com/NirDiamant/moltbook-agent-guard/tree/main/security): Guardrails and policy enforcement.
+- [tools/observatory](https://github.com/NirDiamant/moltbook-agent-guard/tree/main/tools/observatory): Runtime observability.
+- [tools/agent](https://github.com/NirDiamant/moltbook-agent-guard/tree/main/tools/agent): Agent runtime.
+- [tools/cost_calculator](https://github.com/NirDiamant/moltbook-agent-guard/tree/main/tools/cost_calculator): Cost tracking.
+- [tools/notifications](https://github.com/NirDiamant/moltbook-agent-guard/tree/main/tools/notifications): Notification hooks.
+- [tools/moltbook_cli](https://github.com/NirDiamant/moltbook-agent-guard/tree/main/tools/moltbook_cli): Command-line interface.
+- [archetypes](https://github.com/NirDiamant/moltbook-agent-guard/tree/main/archetypes): Prebuilt agent archetypes.
+- [dashboard](https://github.com/NirDiamant/moltbook-agent-guard/tree/main/dashboard) and [dashboard-tools](https://github.com/NirDiamant/moltbook-agent-guard/tree/main/dashboard-tools): Streamlit dashboard, tracker and Slack bot.
+- [integrations](https://github.com/NirDiamant/moltbook-agent-guard/tree/main/integrations): Third-party integrations.
+
+## Learning and Examples
+
+- [tutorials](https://github.com/NirDiamant/moltbook-agent-guard/tree/main/tutorials): Worked tutorials.
+- [examples](https://github.com/NirDiamant/moltbook-agent-guard/tree/main/examples): Runnable examples.
+- [gallery](https://github.com/NirDiamant/moltbook-agent-guard/tree/main/gallery): Showcase.
+- [tests](https://github.com/NirDiamant/moltbook-agent-guard/tree/main/tests): Test suite.
+
+## Related work by the same author
+
+- [RAG_Techniques](https://github.com/NirDiamant/RAG_Techniques): 41 notebooks on Retrieval-Augmented Generation.
+- [GenAI_Agents](https://github.com/NirDiamant/GenAI_Agents): 59 notebooks implementing GenAI agents.
+- [agents-towards-production](https://github.com/NirDiamant/agents-towards-production): Taking agents from prototype to deployed product.
+- [Newsletter](https://newsletter.diamant-ai.com): Weekly deep dives on GenAI engineering.
+- [Community Discord](https://discord.gg/cA6Aa4uyDX): Questions, contributions and discussion.
